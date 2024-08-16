@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const admin = require('firebase-admin');
 const path = require('path');
-require('dotenv').config(); // Load environment variables
+require('dotenv').config(); // Load environment variables from .env file
 
 // Ensure all required environment variables are present
 const requiredEnvVars = [
@@ -46,11 +46,14 @@ admin.initializeApp({
 const db = admin.firestore();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware to parse request bodies
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// Serve static files from the "public" directory
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 // Serve the HTML file
 app.get('/', (req, res) => {
@@ -59,23 +62,22 @@ app.get('/', (req, res) => {
 
 // Handle form submission
 app.post('/create-ticket', async (req, res) => {
-  const { name, email, phone, location, date, issue, priority } = req.body;
+  const { clientName, clientNumber, location, houseNumber, problem, reportTime } = req.body;
 
   try {
-    await db.collection('ticket').add({
-      name: name,
-      email: email,
-      phone: phone,
-      location: location,
-      date: date,
-      issue: issue,
-      priority: priority,
+    await db.collection('tickety').add({
+      clientName,
+      clientNumber,
+      location,
+      houseNumber,
+      problem,
+      reportTime: new Date(reportTime), // Ensure this is a date object
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
     res.send('Ticket created successfully!');
   } catch (error) {
-    console.error('Error adding ticket: ', error);
+    console.error('Error adding ticket:', error);
     res.status(500).send('Error creating ticket');
   }
 });
