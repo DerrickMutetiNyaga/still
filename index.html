@@ -14,6 +14,31 @@
     <!-- Custom Css -->
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/color_skins.css">
+    <style>
+        .popup {
+            position: fixed;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #4caf50; /* Green for success */
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            transition: top 0.3s ease-in-out;
+            z-index: 1000;
+        }
+    
+        .popup.error {
+            background-color: #f44336; /* Red for error */
+        }
+    
+        .popup.success {
+            background-color: #4caf50; /* Green for success */
+        }
+    </style>
+    
+  
 
 </head>
 
@@ -85,16 +110,16 @@
                 </li>
                 <li class="header">MAIN NAVIGATION</li>
 
-                <li class="active open"><a href="blog-post.html"><i class="zmdi zmdi-plus-circle"></i><span>Create Blog
+                <li class="active open"><a href="https://3iconic.co.ke/admin/blog-post.html"><i class="zmdi zmdi-plus-circle"></i><span>Create Blog
                         </span> </a> </li>
-                <li class="active open"><a href="blank.html"><i class="zmdi zmdi-plus-circle"></i><span>Create expense
+                <li class="active open"><a href="https://3iconic.co.ke/admin/blank.html"><i class="zmdi zmdi-plus-circle"></i><span>Create expense
                         </span> </a> </li>
-                        <li class="active open"><a href="createTicket.html"><i class="zmdi zmdi-plus-circle"></i><span>Create Ticket
+                        <li class="active open"><a href="#"><i class="zmdi zmdi-plus-circle"></i><span>Create Ticket
                         </span> </a> </li>
                        
-                <li><a href="blog-grid.html"><i class="zmdi zmdi-grid"></i><span>Blogs</span> </a> </li>
-                <li><a href="tickets.html"><i class="zmdi zmdi-grid"></i><span>Tickets</span> </a> </li>
-                <li><a href="expense.html"><i class="zmdi zmdi-grid"></i><span>Expenses</span> </a> </li>
+                <li><a href="https://3iconic.co.ke/admin/blog-grid.html"><i class="zmdi zmdi-grid"></i><span>Blogs</span> </a> </li>
+                <li><a href="https://3iconic.co.ke/admin/tickets.html"><i class="zmdi zmdi-grid"></i><span>Tickets</span> </a> </li>
+                <li><a href="https://3iconic.co.ke/admin/expense.html"><i class="zmdi zmdi-grid"></i><span>Expenses</span> </a> </li>
 
 
             </ul>
@@ -559,7 +584,7 @@
                                 <br>
                                 <button type="submit" class="btn btn-primary">Submit Ticket</button>
                             </form>
-                            <div id="statusMessage"></div>
+                            <div id="statusMessage" class="status-message"></div> 
                         </div>
                         
                     </div>
@@ -568,6 +593,52 @@
         </div>
     </section>
     <!-- Jquery Core Js -->
+    <script>
+        document.getElementById('ticketForm').addEventListener('submit', async function (e) {
+            e.preventDefault(); // Prevent the default form submission
+    
+            const formData = new FormData(this);
+    
+            try {
+                const response = await fetch('/create-ticket', {
+                    method: 'POST',
+                    body: JSON.stringify(Object.fromEntries(formData)),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+    
+                const result = await response.json();
+                showPopup(result.message, response.ok ? 'success' : 'error');
+    
+                if (response.ok) {
+                    this.reset(); // Clear the form fields
+                }
+            } catch (error) {
+                showPopup('An error occurred. Please try again.', 'error');
+            }
+        });
+    
+        function showPopup(message, type) {
+            const popup = document.createElement('div');
+            popup.className = `popup ${type}`;
+            popup.innerText = message;
+    
+            document.body.appendChild(popup);
+    
+            // Animate the popup
+            setTimeout(() => {
+                popup.style.top = '20px';
+            }, 100);
+    
+            // Remove the popup after 3 seconds
+            setTimeout(() => {
+                popup.style.top = '-50px';
+                setTimeout(() => popup.remove(), 500);
+            }, 3000);
+        }
+    </script>
+    
    
     <script src="assets/bundles/libscripts.bundle.js"></script> <!-- Lib Scripts Plugin Js -->
     <script src="assets/bundles/vendorscripts.bundle.js"></script> <!-- Lib Scripts Plugin Js -->
